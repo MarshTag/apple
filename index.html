@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MP6 Studio</title>
+<style>
+:root{--bg:#0e1016;--side:#141722;--card:#1a1e2c;--card2:#232840;--line:#2e3552;--text:#eceef6;--muted:#8a90a8;--acc:#7c6cf0;--acc2:#9183f5;--ok:#3ecf8e;--err:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI","Helvetica Neue",Arial,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:18px 28px;background:var(--side);border-bottom:1px solid var(--line)}
+header svg{width:38px;height:38px}header b{font-size:20px}header span{color:var(--muted);font-size:13px}
+nav{display:flex;gap:6px;margin-left:auto}
+nav button{background:none;border:0;color:var(--muted);font:600 14px inherit;font-family:inherit;padding:9px 16px;border-radius:8px;cursor:pointer}
+nav button.on{background:var(--card2);color:var(--text)}
+main{max-width:900px;margin:0 auto;padding:28px 20px 60px}
+h1{margin:0 0 4px;font-size:26px}p.sub{margin:0 0 20px;color:var(--muted)}
+.card{background:var(--card);border-radius:12px;padding:22px 26px;margin-bottom:18px}
+label{display:block;font:700 12px inherit;font-family:inherit;letter-spacing:.04em;margin:16px 0 6px}label:first-child{margin-top:0}
+.hint{color:var(--muted);font-size:12px;margin-top:5px}
+input[type=text]{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:8px;font:inherit}
+input[type=text]:focus{outline:0;border-color:var(--acc)}
+.file{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;cursor:pointer}
+.file input{display:none}.file em{font-style:normal;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{display:inline-block;background:var(--acc);color:#fff;border:0;border-radius:8px;padding:11px 20px;font:700 14px inherit;font-family:inherit;cursor:pointer}
+.btn:hover{background:var(--acc2)}.btn.ghost{background:var(--card2)}.btn.ghost:hover{background:var(--line)}.btn:disabled{opacity:.5;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:var(--card2);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}.chip:hover{color:var(--text);background:var(--line)}
+#status{min-height:24px;margin:14px 0;color:var(--muted)}#status.ok{color:var(--ok)}#status.err{color:var(--err)}
+.grid{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:18px;align-items:start}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.thumb{position:relative;aspect-ratio:16/9;background:var(--card2);border-radius:8px;overflow:hidden;cursor:pointer}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.thumb .play{position:absolute;inset:0;margin:auto;width:68px;height:68px;border-radius:50%;background:rgba(14,16,22,.67);display:grid;place-items:center;font-size:26px;pointer-events:none}
+.fname{font-weight:700;margin-top:12px;word-break:break-all}.small{color:var(--muted);font-size:12px}
+.badge{display:inline-block;background:var(--acc);color:#fff;font-weight:700;padding:2px 10px;border-radius:6px;margin-left:8px}
+.row{display:flex;gap:10px;padding:5px 0;font-size:14px;word-break:break-all}.row span:first-child{color:var(--muted);min-width:70px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
+.drop.over{border-color:var(--acc);color:var(--text)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header>
+  <svg id="logo" viewBox="0 0 256 256" aria-label="MP6 logo"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M56 16h100l52 52v160a12 12 0 0 1-12 12H56a12 12 0 0 1-12-12V28a12 12 0 0 1 12-12z" fill="url(#bg)"/><path d="M156 16v40a12 12 0 0 0 12 12h40z" fill="#fff" fill-opacity=".35"/><path fill="#fff" d="M122 84v62.5a22 22 0 1 0 12 19.5V104l40-9v35.5a22 22 0 1 0 12 19.5V76z" transform="translate(-8 -4) scale(.9)"/><rect x="68" y="186" width="120" height="36" rx="10" fill="#fff"/><text x="128" y="212" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="800" font-size="26" fill="#3B3FD9" letter-spacing="1">MP6</text></svg>
+  <div><b>MP6 Studio</b><br><span>Video + project file in one</span></div>
+  <nav><button id="t-conv" class="on">Convert</button><button id="t-play">Player</button></nav>
+</header>
+
+<main>
+<section id="p-conv">
+  <h1>Convert</h1><p class="sub">Bundle a video and its project file into a single .mp6</p>
+  <div class="card">
+    <label>VIDEO FILE</label>
+    <label class="file"><input id="video" type="file" accept="video/*,.mkv,.avi,.mov,.m4v"><span class="btn ghost">Browse</span><em id="video-n">No file chosen</em></label>
+    <label>PROJECT FILE (OPTIONAL)</label>
+    <label class="file"><input id="proj" type="file"><span class="btn ghost">Browse</span><em id="proj-n">No file chosen</em></label>
+    <div class="hint">The editing project that was used to make the video</div>
+    <label>PROJECT APP</label>
+    <input id="app" type="text" placeholder="e.g. Adobe Premiere Pro">
+    <div class="chips" id="chips"></div>
+  </div>
+  <button class="btn" id="go">Convert to .mp6</button>
+  <div id="status"></div>
+  <div class="small">MP4 and MOV videos become a normal MP4 with the project hidden inside, so the file still plays in most video apps (rename to .mp4 if an app refuses it). Other formats are stored in a container that only MP6 Studio can play.</div>
+</section>
+
+<section id="p-play" class="hide">
+  <h1>Player</h1><p class="sub">Open an .mp6 to preview it, see its project, and play it</p>
+  <label class="drop" id="drop" style="display:block;cursor:pointer"><input id="open" type="file" accept=".mp6,.mp4,.mov,.m4v" class="hide">Drop an .mp6 here, or click to choose one</label>
+  <div id="result"></div>
+</section>
+</main>
+<footer>Everything runs in your browser. Your files are never uploaded.</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const enc = new TextEncoder(), dec = new TextDecoder();
+const UUID = [0x4d,0x50,0x36,0xa1,0xb2,0xc3,0x4d,0x5e,0x8f,0x60,0x71,0x82,0x93,0xa4,0xb5,0xc6];
+const FIRST_OK = ["ftyp","moov","mdat","wide","free","skip"];
+const u8 = async (b, a, e) => new Uint8Array(await b.slice(a, e).arrayBuffer());
+const size = n => n < 1024 ? n + " B" : n < 1048576 ? (n/1024).toFixed(1) + " KB" : n < 1073741824 ? (n/1048576).toFixed(1) + " MB" : (n/1073741824).toFixed(2) + " GB";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const say = (t, k = "") => { const s = $("#status"); s.textContent = t; s.className = k; };
+const dl = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 6e4); };
+
+/* favicon from the logo */
+document.head.insertAdjacentHTML("beforeend", '<link rel="icon" href="data:image/svg+xml,' + encodeURIComponent($("#logo").outerHTML.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"')) + '">');
+
+/* tabs */
+const tab = w => { for (const t of ["conv","play"]) { $("#p-"+t).classList.toggle("hide", t !== w); $("#t-"+t).classList.toggle("on", t === w); } };
+$("#t-conv").onclick = () => tab("conv"); $("#t-play").onclick = () => tab("play");
+
+/* ---------- ZIP (stored, no compression) ---------- */
+const CRC = new Uint32Array(256).map((_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+async function crc32(blob) { let c = ~0; for (let p = 0; p < blob.size; p += 8 << 20) { const a = await u8(blob, p, p + (8 << 20)); for (let i = 0; i < a.length; i++) c = CRC[(c ^ a[i]) & 255] ^ (c >>> 8); } return (~c) >>> 0; }
+
+async function makeZip(entries) {
+  const parts = [], cd = []; let off = 0;
+  for (const e of entries) {
+    const nm = enc.encode(e.name), crc = await crc32(e.blob), sz = e.blob.size;
+    if (sz >= 0xFFFFFFFF) throw Error("File too large for the browser version (4 GB limit).");
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 0x21, true);
+    h.setUint32(14, crc, true); h.setUint32(18, sz, true); h.setUint32(22, sz, true); h.setUint16(26, nm.length, true);
+    parts.push(h.buffer, nm, e.blob);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 0x21, true);
+    c.setUint32(16, crc, true); c.setUint32(20, sz, true); c.setUint32(24, sz, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    cd.push(c.buffer, nm); off += 30 + nm.length + sz;
+  }
+  const cdSize = cd.reduce((a, x) => a + x.byteLength, 0), end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+  end.setUint32(12, cdSize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...cd, end.buffer]);
+}
+
+async function readZip(blob) {
+  const n = blob.size; if (n < 22) throw Error("bad zip");
+  const ev = new DataView((await u8(blob, n - 22, n)).buffer);
+  if (ev.getUint32(0, true) !== 0x06054b50) throw Error("bad zip");
+  const cnt = ev.getUint16(10, true), cdSz = ev.getUint32(12, true), cdOff = ev.getUint32(16, true);
+  const c = await u8(blob, cdOff, cdOff + cdSz), cv = new DataView(c.buffer), files = {}; let p = 0;
+  for (let i = 0; i < cnt; i++) {
+    let usz = cv.getUint32(p + 24, true), csz = cv.getUint32(p + 20, true), lo = cv.getUint32(p + 42, true);
+    const nl = cv.getUint16(p + 28, true), el = cv.getUint16(p + 30, true), cl = cv.getUint16(p + 32, true);
+    if (usz === 0xFFFFFFFF || csz === 0xFFFFFFFF || lo === 0xFFFFFFFF) {   // zip64 extra (files made by the desktop app)
+      let q = p + 46 + nl; const stop = q + el;
+      while (q < stop) { const id = cv.getUint16(q, true), l = cv.getUint16(q + 2, true);
+        if (id === 1) { let r = q + 4;
+          if (usz === 0xFFFFFFFF) { usz = Number(cv.getBigUint64(r, true)); r += 8; }
+          if (csz === 0xFFFFFFFF) { csz = Number(cv.getBigUint64(r, true)); r += 8; }
+          if (lo === 0xFFFFFFFF) { lo = Number(cv.getBigUint64(r, true)); } }
+        q += 4 + l; }
+    }
+    files[dec.decode(c.subarray(p + 46, p + 46 + nl))] = { size: csz, off: lo };
+    p += 46 + nl + el + cl;
+  }
+  const get = async (name, type) => { const f = files[name], lh = new DataView((await u8(blob, f.off, f.off + 30)).buffer);
+    const s = f.off + 30 + lh.getUint16(26, true) + lh.getUint16(28, true); return blob.slice(s, s + f.size, type); };
+  return { files, get };
+}
+
+/* ---------- MP4 boxes ---------- */
+async function boxes(f) {
+  const out = []; let pos = 0;
+  while (pos + 8 <= f.size) {
+    const h = await u8(f, pos, pos + 32), dv = new DataView(h.buffer);
+    const raw = dv.getUint32(0), type = String.fromCharCode(...h.slice(4, 8)); let sz = raw, hl = 8;
+    if (raw === 1) { sz = Number(dv.getBigUint64(8)); hl = 16; } else if (raw === 0) sz = f.size - pos;
+    if (sz < hl || pos + sz > f.size) break;
+    out.push({ pos, sz, hl, type, raw, h }); pos += sz;
+  }
+  return out;
+}
+async function isCleanIso(f) {
+  const b = await boxes(f); if (!b.length || !FIRST_OK.includes(b[0].type) || b.some(x => x.raw === 0)) return false;
+  const l = b[b.length - 1]; return l.pos + l.sz === f.size;
+}
+async function findBox(f) {
+  for (const b of await boxes(f)) if (b.type === "uuid" && UUID.every((v, i) => b.h[b.hl + i] === v))
+    return { start: b.pos, pstart: b.pos + b.hl + 16, plen: b.sz - b.hl - 16 };
+  return null;
+}
+
+/* ---------- preview thumbnail ---------- */
+const previewOf = file => new Promise(res => {
+  const v = document.createElement("video"), url = URL.createObjectURL(file); let done = false;
+  const fin = b => { if (done) return; done = true; URL.revokeObjectURL(url); res(b); };
+  v.muted = true; v.preload = "auto"; v.playsInline = true;
+  v.onerror = () => fin(null); setTimeout(() => fin(null), 8000);
+  v.onloadedmetadata = () => { v.currentTime = Math.min(Math.max(v.duration * 0.1, 0.05), 3); };
+  v.onseeked = () => { if (!v.videoWidth) return fin(null);
+    const w = Math.min(640, v.videoWidth), h = Math.round(w * v.videoHeight / v.videoWidth), c = document.createElement("canvas");
+    c.width = w; c.height = h; c.getContext("2d").drawImage(v, 0, 0, w, h); c.toBlob(fin, "image/jpeg", .84); };
+  v.src = url;
+});
+
+/* ---------- convert ---------- */
+["Premiere Pro","DaVinci Resolve","Final Cut Pro","After Effects","CapCut"].forEach(n => {
+  const c = document.createElement("span"); c.className = "chip"; c.textContent = n; c.onclick = () => $("#app").value = n; $("#chips").append(c); });
+$("#video").onchange = e => $("#video-n").textContent = e.target.files[0]?.name || "No file chosen";
+$("#proj").onchange = e => $("#proj-n").textContent = e.target.files[0]?.name || "No file chosen";
+
+$("#go").onclick = async () => {
+  const video = $("#video").files[0], proj = $("#proj").files[0], app = $("#app").value.trim();
+  if (!video) return say("Pick a video file.", "err");
+  if (!app) return say("Type the project app name.", "err");
+  $("#go").disabled = true;
+  try {
+    say("Checking video...");
+    const stem = video.name.replace(/\.[^.]+$/, "");
+    let hybrid = await isCleanIso(video), videoLen = video.size, videoFile = video.name;
+    if (hybrid) { const old = await findBox(video); if (old) videoLen = old.start; if (!/\.(mp4|mov|m4v)$/i.test(videoFile)) videoFile = stem + ".mp4"; }
+    say("Making preview...");
+    const prev = await previewOf(video);
+    const man = { format: "MP6", version: 2, kind: hybrid ? "hybrid" : "zip", title: stem, project_app: app, video_file: videoFile,
+                  project_file: proj ? proj.name : null, created: new Date().toISOString().slice(0, 19).replace("T", " ") };
+    const meta = [{ name: "manifest.json", blob: new Blob([JSON.stringify(man, null, 2)]) }];
+    if (prev) meta.push({ name: "preview.jpg", blob: prev });
+    if (proj) meta.push({ name: "project/" + proj.name, blob: proj });
+    say("Writing file...");
+    let out;
+    if (hybrid) {
+      const payload = await makeZip(meta), hd = new DataView(new ArrayBuffer(8));
+      hd.setUint32(0, 24 + payload.size); new Uint8Array(hd.buffer).set(enc.encode("uuid"), 4);
+      out = new Blob([video.slice(0, videoLen), hd.buffer, new Uint8Array(UUID), payload], { type: "application/octet-stream" });
+    } else out = await makeZip([...meta, { name: "video/" + video.name, blob: video }]);
+    dl(out, stem + ".mp6");
+    say(hybrid ? "Done. Your .mp6 is also a normal MP4 inside, so most video apps can play it." : "Done (container mode). Only MP6 Studio can play this one - use an MP4 or MOV video for universal playback.", "ok");
+  } catch (e) { say("Something went wrong: " + e.message, "err"); }
+  $("#go").disabled = false;
+};
+
+/* ---------- player ---------- */
+const mime = n => /\.mp4$|\.m4v$/i.test(n) ? "video/mp4" : /\.mov$/i.test(n) ? "video/quicktime" : /\.webm$/i.test(n) ? "video/webm" : /\.mkv$/i.test(n) ? "video/x-matroska" : "video/mp4";
+async function openMp6(file) {
+  const box = $("#result"); box.innerHTML = "";
+  try {
+    const f = await findBox(file), hybrid = !!f;
+    const zip = hybrid ? await readZip(file.slice(f.pstart, f.pstart + f.plen)) : await readZip(file);
+    const man = JSON.parse(dec.decode(await (await zip.get("manifest.json")).arrayBuffer()));
+    if (man.format !== "MP6") throw Error();
+    const vname = man.video_file || "video.mp4";
+    const vblob = hybrid ? file.slice(0, f.start, "video/mp4") : await zip.get("video/" + vname, mime(vname));
+    const pj = man.project_file && zip.files["project/" + man.project_file] ? man.project_file : null;
+    const pimg = zip.files["preview.jpg"] ? URL.createObjectURL(await zip.get("preview.jpg", "image/jpeg")) : null;
+    box.innerHTML = `<div class="grid"><div class="card"><div class="thumb" id="th">${pimg ? `<img src="${pimg}" alt="">` : ""}<div class="play">▶</div></div>
+      <div class="fname">${esc(file.name)}</div><div class="small">${hybrid ? "Plays as MP4" : "MP6 container"} - ${size(file.size)}</div></div>
+      <div class="card"><div style="font-size:19px;font-weight:700;margin-bottom:8px">${esc(man.title)}</div>
+      <div style="margin-bottom:14px"><span class="small" style="font-size:14px">Made in</span><span class="badge">${esc(man.project_app)}</span></div>
+      <div class="row"><span>Video</span><span>${esc(vname)} (${size(vblob.size)})</span></div>
+      <div class="row"><span>Project</span><span>${pj ? esc(pj) + " (" + size(zip.files["project/" + pj].size) + ")" : "None"}</span></div>
+      <div class="row"><span>Created</span><span>${esc(man.created)}</span></div>
+      <div class="actions" style="margin-top:14px"><button class="btn" id="b-play">▶ Play</button><button class="btn ghost" id="b-share">Share as video</button><button class="btn ghost" id="b-proj" ${pj ? "" : "disabled"}>Export project</button></div></div></div>`;
+    const play = () => { const t = $("#th"); t.innerHTML = `<video controls autoplay src="${URL.createObjectURL(vblob)}"></video>`; t.style.cursor = "default"; t.onclick = null; };
+    $("#th").onclick = play; $("#b-play").onclick = play;
+    $("#b-share").onclick = () => {
+      if (hybrid) { const keep = pj && confirm("Keep the project file hidden inside the exported video?\n\nOK = keep it, Cancel = clean video (best before posting publicly).");
+        dl(keep ? file.slice(0, file.size, "video/mp4") : vblob, man.title + ".mp4"); }
+      else dl(vblob, vname);
+    };
+    if (pj) $("#b-proj").onclick = async () => dl(await zip.get("project/" + pj), pj);
+  } catch (e) { box.innerHTML = '<div class="card" style="color:var(--err)">No MP6 data found in that file. Is it a real .mp6, or an .mp4 exported from MP6 Studio with the project kept inside?</div>'; }
+}
+$("#open").onchange = e => e.target.files[0] && openMp6(e.target.files[0]);
+const drop = $("#drop");
+addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+addEventListener("dragleave", () => drop.classList.remove("over"));
+addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) { tab("play"); openMp6(f); } });
+</script>
+</body>
+</html>
